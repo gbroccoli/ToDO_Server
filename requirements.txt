@@ -1,0 +1,16 @@
+fastapi[all]
+psycopg2-binary
+python-multipart
+uvicorn
+sqlalchemy
+alembic
+python-dotenv
+click
+colorama
+websockets
+asyncpg
+bcrypt
+pydantic
+pytest
+envdatareader
+python-jose
