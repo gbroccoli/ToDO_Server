@@ -1,14 +1,19 @@
 import os
-import importlib
+from importlib import import_module
 
-routers = []
-routers_path = "core\\routers"
+urls = []
 
-routers_list = [file for file in os.listdir(routers_path) if file.endswith(".py") and file != "__init__.py"]
+path_urls = "core\\routers"
 
-for router in routers_list:
-	module_name = "core.routers.{}".format(router[:-3])
-	module = importlib.import_module(module_name)
-	
-	if hasattr(module, "routers"):
-		routers.extend(module.routers)
+list_urls = [item for item in os.listdir(path_urls) if item.endswith(".py") and item != "__init__.py"]
+
+for item in list_urls:
+    module_name = "core.routers.{}".format(item[:-3])
+    
+	# Загружаем модуль
+    module = import_module(module_name)
+
+    # Проверяем наличие атрибута 'routers' в модуле
+    if hasattr(module, "routers"):
+        # Если атрибут существует, добавляем его содержимое в список 'urls'
+        urls.extend(module.routers)

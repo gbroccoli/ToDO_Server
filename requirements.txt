@@ -14,3 +14,7 @@ pydantic
 pytest
 envdatareader
 python-jose
+flake8 
+autopep8
+black
+inflect

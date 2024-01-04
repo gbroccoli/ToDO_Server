@@ -1,16 +1,17 @@
 version: "3.8"
 services:
   db:
-    image: "postgres:latest"
-    container_name: "postgres"
+    image: postgres:latest
+    container_name: database
+    hostname: psql
     environment:
-      POSTGRES_DB: todo
-      POSTGRES_PASSWORD: 7Yc/qXD?zp 
-      POSTGRES_USER: broccoli
+    - POSTGRES_USER=${DB_USER}
+    - POSTGRES_PASSWORD=${DB_PASSWORD}
+    - POSTGRES_DB=${DB_NAME}
     ports:
-      - "5432:5432"
+      - "${DB_PORT}:5432"
     volumes:
-      - .vm:/var/lib/postgresql/data
+      - ./vm/postgres:/var/lib/postgresql/data
 
 volumes:
   vm:

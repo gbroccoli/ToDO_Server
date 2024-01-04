@@ -4,6 +4,10 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
+from core.config.datebase import Base, DB_CONFIG as item
+from database.models import import_module
+
+import_module = import_module
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -18,7 +22,14 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = None
+target_metadata = Base.metadata
+config.set_main_option(
+    "sqlalchemy.url",
+    (
+        f"postgresql+asyncpg://{item['USER']}:{item['PASSWORD']}"
+        f"@{item['HOST']}:{item['PORT']}/{item['NAME']}?async_fallback=True"
+    ),
+)
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
