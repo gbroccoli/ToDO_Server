@@ -53,3 +53,22 @@ class JWTStatus(Enum):
     JWT_INVALID_AUDIENCE = "code_50_08"					# Недействительная аудитория JWT
     JWT_INVALID_ISSUER = "code_50_09"  					# Недействительный издатель JWT
     JWT_ACCESS_DENIED = "code_50_10"   					# Доступ запрещен на основе JWT
+
+class CRUDStatus(Enum):
+    # Коды для операций создания, чтения, обновления и удаления данных
+    CREATE_SUCCESS = "code_60_00"                   	# Создание успешно
+    CREATE_FAILURE = "code_60_01"                   	# Ошибка при создании
+    READ_SUCCESS = "code_60_02"                     	# Чтение успешно
+    READ_FAILURE = "code_60_03"                     	# Ошибка при чтении
+    UPDATE_SUCCESS = "code_60_04"                   	# Обновление успешно
+    UPDATE_FAILURE = "code_60_05"                   	# Ошибка при обновлении
+    DELETE_SUCCESS = "code_60_06"                   	# Удаление успешно
+    DELETE_FAILURE = "code_60_07"                   	# Ошибка при удалении
+    ITEM_NOT_FOUND = "code_60_08"                   	# Элемент не найден
+    PERMISSION_DENIED = "code_60_09"                	# Доступ запрещен
+    INVALID_DATA = "code_60_10"                     	# Недопустимые данные
+    DUPLICATE_ITEM = "code_60_11"                   	# Дублирующийся элемент
+    RATE_LIMIT_EXCEEDED = "code_60_12"              	# Превышен лимит запросов
+    OPERATION_NOT_ALLOWED = "code_60_13"            	# Операция не разрешена
+    UNEXPECTED_ERROR_CRUD = "code_60_14"            	# Непредвиденная ошибка в CRUD операциях
+    MISSING_REQUIRED_FIELDS = "code_60_15"          	# Не заполнены все обязательные поля

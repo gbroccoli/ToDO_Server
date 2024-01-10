@@ -33,7 +33,7 @@ def alembic_upgrade(alembic_cfg_path: str = "alembic.ini"):
 def create_model_file(table_name):
 	path = "database\\models"
 	
-	class_name = table_name.capitalize()
+	class_name = p.plural(table_name).capitalize()
 	table_name = p.plural(table_name).lower()
 
 	template = Template(model_template)
@@ -45,5 +45,7 @@ def create_model_file(table_name):
 	with open(os.path.join(path, table_name.lower() + ".py"), "w") as file:
 		file.write(model_content)
 
-
+def downground(count: str, alembic_cfg_path: str = "alembic.cfg"):
+	alembic_cfg = Config(alembic_cfg_path)
+	command.downgrade(alembic_cfg, f"-{count}")
 

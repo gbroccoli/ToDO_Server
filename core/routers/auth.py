@@ -24,6 +24,7 @@ class Nominee(BaseModel):
 	patronymic: Optional[str] = None
 	login: str
 	password: str
+	role: Optional[str] = "user"
 
 class User(BaseModel):
 	login: str
@@ -36,7 +37,7 @@ async def login(user: User, response: Response):
 	if not (user.login and user.password):
 		return JSONResponse(
 			status_code=status.HTTP_400_BAD_REQUEST, content={
-				"code": RegistrationStatus.MISSING_FIELDS,
+				"code": RegistrationStatus.MISSING_FIELDS.value,
 				"type": "error",
 				"msg": "Не заполнены обязательные поля"
 			})
@@ -48,18 +49,18 @@ async def login(user: User, response: Response):
 		return JSONResponse(
 			status_code=status.HTTP_401_UNAUTHORIZED,
 			content={
-				"code": AuthorizationStatus.INVALID_LOGIN,
+				"code": AuthorizationStatus.INVALID_LOGIN.value,
 				"type": "error",
 				"msg": "Неверный логин или пароль"
 			}
 		)
 	
-	id, login, password = user_res[0]
+	id, login, password, role = user_res
 	if not PasswordManager.verify_password(user.password, password):
 		return JSONResponse(
 			status_code=status.HTTP_401_UNAUTHORIZED,
 			content={
-				"code": AuthorizationStatus.INVALID_LOGIN,
+				"code": AuthorizationStatus.INVALID_LOGIN.value,
 				"type": "error",
 				"msg": "Неверный логин или пароль"
 			}
@@ -83,9 +84,13 @@ async def login(user: User, response: Response):
 	)
 
 	return {
-		"code": AuthorizationStatus.AUTH_SUCCESS,
+		"code": AuthorizationStatus.AUTH_SUCCESS.value,
 		"type": "success",
-		"msg": "success"
+		"msg": "success",
+		"data": {
+			"user_id": id,
+			"role": role
+		}
 	}
 
 
@@ -95,14 +100,14 @@ async def register(nominee: Nominee):
 	if not (nominee.surname and nominee.name and nominee.login and nominee.password):
 		return JSONResponse(
 			status_code=status.HTTP_400_BAD_REQUEST, content={
-				"code": RegistrationStatus.MISSING_FIELDS,
+				"code": RegistrationStatus.MISSING_FIELDS.value,
 				"type": "error",
 				"msg": "Не заполнены обязательные поля"
 			})
 	
 	if not check_password_strength(nominee.password):
 		return JSONResponse(status=status.HTTP_401_UNAUTHORIZED, content={
-			"code": RegistrationStatus.WEAK_PASSWORD,
+			"code": RegistrationStatus.WEAK_PASSWORD.value,
 			"type": "error",
 			"msg": "Пароль не соответвует требованиям"
 		})
@@ -111,7 +116,7 @@ async def register(nominee: Nominee):
 
 	if incident:
 		return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={
-			"code": RegistrationStatus.USER_ALREADY_EXISTS,
+			"code": RegistrationStatus.USER_ALREADY_EXISTS.value,
 			"type": "error",
 			"msg": "Данный пользователь уже существует" 
 		})
@@ -121,14 +126,15 @@ async def register(nominee: Nominee):
 		"password": PasswordManager.hash_password(nominee.password),
 		"surname": nominee.surname,
 		"name": nominee.name,
-		"patronymic": nominee.patronymic
+		"patronymic": nominee.patronymic,
+		"role": nominee.role,
 	}
 
 	user = await DatabaseCRUD.create_user(user_incident)
 
 	if not user:
 		return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={
-			"code": RegistrationStatus.UNEXPECTED_ERROR_REGISTRATION,
+			"code": RegistrationStatus.UNEXPECTED_ERROR_REGISTRATION.value,
 			"type": "error",
 			"msg": "Произошла непредвидинная ошибка!"
 		})
@@ -136,7 +142,7 @@ async def register(nominee: Nominee):
 	return JSONResponse(
 		status_code=status.HTTP_201_CREATED, 
 		content={
-			"code": RegistrationStatus.REGISTRATION_SUCCESS,
+			"code": RegistrationStatus.REGISTRATION_SUCCESS.value,
 			"type": "success",
 			"mgs": "Регестрация прошла успешно!"
 		})
@@ -149,7 +155,7 @@ async def authorization(request: Request, response: Response):
 
 			refresh_token = Token.verify_token(token=request.cookies.get("refresh_token"))
 
-			if refresh_token["code"] == JWTStatus.JWT_VALID:
+			if refresh_token["code"] == JWTStatus.JWT_VALID.value:
 				access_token = Token.refresh_access_token(refresh_token=request.cookies.get("refresh_token"))
 
 				response.set_cookie(
@@ -160,7 +166,7 @@ async def authorization(request: Request, response: Response):
 				)
 
 				return {
-						"code": JWTStatus.JWT_VALID,
+						"code": JWTStatus.JWT_VALID.value,
 						"type": "success",
 						"msg": "Досуп разрешен"
 					}
@@ -174,7 +180,7 @@ async def authorization(request: Request, response: Response):
 
 	if access_token_veri["code"] == JWTStatus.JWT_VALID:
 		return {
-			"code": JWTStatus.JWT_VALID,
+			"code": JWTStatus.JWT_VALID.value,
 			"type": "success",
 			"msg": "Досуп разрешен"
 		}
@@ -184,10 +190,6 @@ async def authorization(request: Request, response: Response):
 			"type": "error",
 			"msg": "Access denied"
 			}) 
-
-@app.post("/refresh")
-async def refresh(response: Response):
-	pass
 
 @app.post("/logout", response_model=Code)
 async def logout(response: Response, request: Request):
@@ -203,13 +205,13 @@ async def logout(response: Response, request: Request):
 		)
 
 		return {
-			"code": LogoutStatus.LOGOUT_SUCCESS,
+			"code": LogoutStatus.LOGOUT_SUCCESS.value,
 			"type": "success",
 			"msg": "Вы успешно вышли из учётной записи!"
 		}
 
 	return {
-		"code": LogoutStatus.UNAUTHORIZED_ACCESS,
+		"code": LogoutStatus.UNAUTHORIZED_ACCESS.value,
 		"type": "error",
 		"msg": "Доступ запрещен"
 	}

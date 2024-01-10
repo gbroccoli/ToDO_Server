@@ -20,7 +20,7 @@ except json.JSONDecodeError:
 class Config:
 
 	def __init__(self):
-		self.origins: List[str] = ["http://localhost", "http://localhost:8080", "http://localhost:8000"]
+		self.origins: List[str] = ["http://localhost", "http://localhost:8080", "http://localhost:8000", "http://localhost:5173"]
 		self.static: List[StaticType] = []
 		self.urls: List = urls
 		self.addOrigin()

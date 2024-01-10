@@ -36,7 +36,7 @@ class Token:
 				return False, "Token has expired"
 
 			return {
-				"code": JWTStatus.JWT_VALID,
+				"code": JWTStatus.JWT_VALID.value,
 				"type": "valid",
 				"msg": "Token is valid"
 			}

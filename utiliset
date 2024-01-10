@@ -8,7 +8,7 @@ from sys import platform
 import subprocess
 from core.utiliset.secretgenerate import create_or_load_secret_key
 from core.utiliset.init_env import get_venv
-from core.utiliset.database_al import alembic_create_migration, alembic_upgrade, create_model_file
+from core.utiliset.database_al import alembic_create_migration, alembic_upgrade, create_model_file, downground
 
 
 def checkOperatingSystem():
@@ -58,6 +58,12 @@ try:
 		create_model_file(table_name)
 		click.echo(f"Model file for {table_name} created successfully.")
 
+	@click.command()
+	@click.argument("count")
+	def downgrade(count):
+		downgrade(count)
+		click.echo(f"Model file for {count} downgraded successfully.")
+
 	@click.group()
 	def cli():
 		pass
@@ -67,6 +73,7 @@ try:
 	cli.add_command(createmigration)
 	cli.add_command(upgrademigration)
 	cli.add_command(createmodel)
+	cli.add_command(downgrade)
 
 except ModuleNotFoundError:
 	cli = None
